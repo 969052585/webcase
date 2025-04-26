@@ -1,0 +1,88 @@
+<script type="importmap">
+    {
+      "imports": {
+        "vue": "../../js/vue.esm-browser.js"
+      }
+    }
+</script>
+
+<meta charset="utf8">
+<title>文字适应纹理</title>
+
+
+<div id="app" class="flex">
+    <div>
+        <button @click="background = './1.jpg'">背景1</button>
+        <button @click="background = './2.jpg'">背景2</button>
+        <input v-model="text">
+        <input v-model="color" type="color">
+    </div>
+
+    <svg v-if="false" height="600px" width="100%">
+        <defs>
+            <filter id="filter"></filter>
+        </defs>
+        <Image preserveAspectRatio="none" x="0" y="0" :href="background" width="100%" height="100%"></Image>
+        <text filter="url(#filter)" x="100px" y="200px" font-size="10rem" font-weight="bolder" :fill="color">
+            {{text}}
+        </text>
+    </svg>
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 330">
+        <!-- 插入墙面图片 -->
+                <image :xlink:href="background" x="0" y="0" width="800" height="600"/>
+        <!-- 定义滤镜效果来模拟雕刻 -->
+        <filter id="carved-effect">
+            <!--            result 像素信息变量 in 输入  SourceGraphic 应用滤镜的原始图像 -->
+            <feImage :href="background" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none"
+                     result="ORIGIN_IMAGE">
+            </feImage>
+            <feColorMatrix
+                    in="ORIGIN_IMAGE"
+                    type="saturate"
+                    values="0"
+                    result="GRAY_IMAGE"
+            ></feColorMatrix>
+            <feDisplacementMap in="SourceGraphic" scale="15" xChannelSelector="R" yChannelSelector="R"
+                               result="TEXTURED_TEXT"
+                               in2="GRAY_IMAGE"></feDisplacementMap>
+            <feColorMatrix
+                    in="TEXTURED_TEXT"
+                    type="matrix"
+                    values="1 0 0 0 0
+                            0 1 0 0 0
+                            0 0 1 0 0
+                            0 0 0 .9 0"
+                    result="OPACITY_TEXT"
+            ></feColorMatrix>
+            <feImage :href="background" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none"
+                     result="BG">
+            </feImage>
+            <feBlend in2="OPACITY_TEXT" in="BG" mode="multiply"></feBlend>
+        </filter>
+        <!-- 创建文字并应用滤镜 -->
+        <text x="50%" y="50%" dominant-baseline="middle" :fill="color" text-anchor="middle" font-size="100"
+              font-family="Arial, sans-serif" filter="url(#carved-effect)">
+            {{text}}
+        </text>
+    </svg>
+</div>
+
+<script type="module">
+    import {createApp} from 'vue'
+
+    createApp({
+        data() {
+            return {
+                text: 'Hello World!',
+                color: 'red',
+                background: './1.jpg',
+            }
+        }
+    }).mount('#app')
+</script>
+
+
+
+
+
